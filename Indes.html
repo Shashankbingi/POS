@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web POS System</title>
+    <link rel="stylesheet" href="Styles.css">
+</head>
+<body>
+    <header>
+        <h1>Web Point of Sale</h1>
+        <nav>
+            <button id="nav-inventory" class="active">Inventory</button>
+            <button id="nav-sales">Sales</button>
+            <button id="nav-dashboard">Dashboard</button>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Inventory Section -->
+        <section id="inventory-section" class="active-section">
+            <h2>Inventory Manager</h2>
+            <div class="search-bar">
+                <input type="text" id="inventory-search" placeholder="Search by description or barcode...">
+                <button id="scan-inventory-barcode">📷 Scan Barcode</button>
+            </div>
+            <table id="inventory-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Barcode</th>
+                        <th>Description</th>
+                        <th>MRP</th>
+                        <th>Quantity</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Inventory items will be loaded here by JavaScript -->
+                </tbody>
+            </table>
+            <div class="inventory-actions">
+                <button id="add-item-btn">Add Item</button>
+                <button id="update-item-btn">Update Item</button>
+                <button id="delete-item-btn">Delete Item</button>
+            </div>
+
+            <!-- Add/Update Item Modal (hidden by default) -->
+            <div id="item-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close-button">&times;</span>
+                    <h3 id="modal-title">Add/Update Item</h3>
+                    <form id="item-form">
+                        <label for="item-barcode">Barcode:</label>
+                        <input type="text" id="item-barcode" required>
+                        <button type="button" id="scan-modal-barcode">📷</button><br>
+
+                        <label for="item-description">Description:</label>
+                        <input type="text" id="item-description" required><br>
+
+                        <label for="item-mrp">MRP:</label>
+                        <input type="number" id="item-mrp" step="0.01" required><br>
+
+                        <label for="item-quantity">Quantity:</label>
+                        <input type="number" id="item-quantity" required><br>
+
+                        <button type="submit" id="save-item-btn">Save</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sales Section -->
+        <section id="sales-section" class="hidden-section">
+            <h2>Sales / Billing</h2>
+            <div class="sales-header">
+                <span id="current-date">📅 Date: </span>
+                <span id="total-amount">Total: ₹0.00</span>
+            </div>
+            <div class="search-bar">
+                <input type="text" id="sales-search" placeholder="Search item by name or barcode...">
+                <button id="scan-sales-barcode">📷 Scan Barcode</button>
+                <ul id="sales-suggestions" class="suggestions-list"></ul>
+            </div>
+
+            <div class="cart-container">
+                <h3>Shopping Cart</h3>
+                <div id="cart-items">
+                    <!-- Cart items will be loaded here by JavaScript -->
+                </div>
+            </div>
+
+            <div class="payment-options">
+                <button id="pay-cash">Cash</button>
+                <button id="pay-card">Card</button>
+                <button id="pay-upi">UPI</button>
+            </div>
+
+            <!-- Cash Payment Modal -->
+            <div id="cash-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close-button">&times;</span>
+                    <h3>Cash Payment</h3>
+                    <p id="cash-modal-total">Total: ₹0.00</p>
+                    <label for="cash-received">Cash Received:</label>
+                    <input type="number" id="cash-received" step="0.01" required><br>
+                    <button id="confirm-cash-payment">Confirm Payment</button>
+                </div>
+            </div>
+
+            <!-- UPI QR Modal -->
+            <div id="upi-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close-button">&times;</span>
+                    <h3>Scan UPI QR</h3>
+                    <!-- This canvas will be used by a QR code library -->
+                    <canvas id="upi-qr-canvas" width="200" height="200"></canvas>
+                    <p id="upi-link-display"></p>
+                    <button id="confirm-upi-payment">Payment Confirmed</button>
+                </div>
+            </div>
+
+            <!-- Barcode Scanner Modal (for all scan buttons) -->
+            <div id="barcode-scanner-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close-button">&times;</span>
+                    <h3>Scan Barcode</h3>
+                    <video id="barcode-video" width="100%" height="auto" style="border: 1px solid #ccc;"></video>
+                    <p id="barcode-scan-result">Scanning...</p>
+                    <button id="stop-barcode-scan">Stop Scan</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard Section -->
+        <section id="dashboard-section" class="hidden-section">
+            <h2>POS Dashboard</h2>
+            <div class="dashboard-summary">
+                <div class="summary-box">
+                    <h3>Total Sales</h3>
+                    <p id="dash-total-sales">₹0.00</p>
+                </div>
+                <div class="summary-box">
+                    <h3>Total Bills</h3>
+                    <p id="dash-total-bills">0</p>
+                </div>
+                <div class="summary-box">
+                    <h3>Avg. Bill</h3>
+                    <p id="dash-avg-bill">₹0.00</p>
+                </div>
+            </div>
+
+            <div class="category-sales">
+                <h3>Category-wise Sales</h3>
+                <ul id="dash-category-sales">
+                    <!-- Category sales will be loaded here by JavaScript -->
+                </ul>
+            </div>
+
+            <div class="recent-transactions">
+                <h3>Recent Transactions</h3>
+                <table id="transactions-table">
+                    <thead>
+                        <tr>
+                            <th>Bill No</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Mode</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Recent transactions will be loaded here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+    <!--
+        To enable real barcode scanning and QR code generation,
+        you would include these libraries:
+    -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/@zxing/library@latest/umd/index.min.js"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script> -->
+</body>
+</html>
